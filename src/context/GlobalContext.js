@@ -1,4 +1,10 @@
-import React, { createContext, useReducer, useRef } from 'react';
+import React, {
+  createContext,
+  useReducer,
+  useRef,
+  useEffect,
+  useState,
+} from 'react';
 
 export const GlobalContext = createContext();
 
@@ -64,6 +70,21 @@ export const GlobalProvider = ({ children }) => {
   const toggleMobileNav = () => {
     dispatch({ type: 'TOGGLE_MOBILE_NAV' });
   };
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 1024);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
   return (
     <GlobalContext.Provider
       value={{
@@ -74,6 +95,8 @@ export const GlobalProvider = ({ children }) => {
         isNavExpanded,
         isMobileNavVisible,
         toggleMobileNav,
+        isMobile,
+        setIsMobile,
       }}
     >
       {children}

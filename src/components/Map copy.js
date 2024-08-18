@@ -11,10 +11,7 @@ import 'leaflet/dist/leaflet.css';
 import { HomeContext } from '../context/HomeContext';
 
 function Map() {
-  const { homeState, homeDispatch } = useContext(HomeContext);
-
-  let position = homeState.position;
-  // ----------------- GoToCoordinates -----------------
+  const { position, setPosition } = useContext(HomeContext);
   const GoToCoordinates = ({ position }) => {
     const map = useMap();
 
@@ -26,19 +23,18 @@ function Map() {
 
     return null;
   };
-  // ----------------------------------------------------
 
   const MapClickHandler = () => {
     useMapEvents({
       click(e) {
         const { lat, lng } = e.latlng;
-        homeDispatch({ type: 'mapClick', payload: [lat, lng] });
+        console.log(`Latitude: ${lat}, Longitude: ${lng}`);
+        setPosition([lat, lng]);
       },
     });
     return null;
   };
 
-  // const apiKey = process.env.REACT_APP_STADIA_API_KEY;
   // const handleButtonClick = () => {
   //   const lat = prompt('Enter latitude:');
   //   const lng = prompt('Enter longitude:');
@@ -66,7 +62,7 @@ function Map() {
         {/* Satellite View  Stadia.AlidadeSatellite*/}
         {/* <TileLayer
           attribution='&copy; CNES, Distribution Airbus DS, &copy; Airbus DS, &copy; PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
-          url={`https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg?api_key=${apiKey}`}
+          url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg"
           maxZoom={20}
         /> */}
 

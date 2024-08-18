@@ -1,0 +1,28 @@
+1
+
+#254336
+#6B8A7A
+#B7B597
+#DAD3BE
+
+2
+#618264
+#79AC78
+#B0D9B1
+#D0E7D2
+
+3
+/* CSS HEX */
+--lapis-lazuli: #05668dff;
+--teal: #028090ff;
+--persian-green: #00a896ff;
+--mint: #02c39aff;
+--cream: #f0f3bdff;
+
+4
+/* CSS HEX */
+--red-pantone: #e63946ff;
+--honeydew: #f1faeeff;
+--non-photo-blue: #a8dadcff;
+--cerulean: #457b9dff;
+--berkeley-blue: #1d3557ff;

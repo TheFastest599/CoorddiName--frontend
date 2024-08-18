@@ -1,25 +1,37 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBars,
+  faMagnifyingGlass,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import { GlobalContext } from '../context/GlobalContext';
 import { HomeContext } from '../context/HomeContext';
 
 const LocationSearch = () => {
-  const { suggestions, setSelectedPlace, fetchSuggestions } =
-    useContext(HomeContext);
+  const { homeState, homeDispatch, fetchSuggestions } = useContext(HomeContext);
 
   const [query, setQuery] = useState('');
+
   const [debounceTimeout, setDebounceTimeout] = useState(null);
+
   const { toggleMobileNav, navbarToggler } = useContext(GlobalContext);
+
   const [searchActive, setSearchActive] = useState(false);
+
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
   const suggestionRefs = useRef([]);
+
+  const locationSearchRef = useRef(null);
+
+  let { suggestions } = homeState;
 
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = event => {
-      if (searchActive) {
+      if (searchActive && suggestions.length > 0) {
         if (event.key === 'ArrowDown') {
           setSelectedIndex(prevIndex =>
             prevIndex < suggestions.length - 1 ? prevIndex + 1 : prevIndex
@@ -28,10 +40,22 @@ const LocationSearch = () => {
           setSelectedIndex(prevIndex =>
             prevIndex > 0 ? prevIndex - 1 : prevIndex
           );
-        } else if (event.key === 'Enter' && selectedIndex >= 0) {
-          setSelectedPlace(suggestions[selectedIndex]);
+        } else if (
+          selectedIndex >= 0 &&
+          event.key === 'Enter' &&
+          suggestions.length > 0
+        ) {
+          homeDispatch({
+            type: 'locationSearch',
+            payload: suggestions[selectedIndex],
+          });
           setQuery(suggestions[selectedIndex].display_name);
           setSearchActive(false);
+        } else if (event.key === 'Enter' && suggestions.length > 0) {
+          homeDispatch({ type: 'locationSearch', payload: suggestions[0] });
+          setQuery(suggestions[0].display_name);
+          setSearchActive(false);
+          setSelectedIndex(-1);
         }
       }
     };
@@ -72,7 +96,7 @@ const LocationSearch = () => {
   return (
     <>
       <div
-        className={`fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 transition-opacity duration-300 z-5 ${
+        className={`fixed top-0 left-0 w-full h-full  bg-black bg-opacity-50 transition-opacity duration-300 z-5 ${
           searchActive ? ' opacity-70' : ' opacity-0 pointer-events-none'
         }`}
         onClick={() => {
@@ -80,26 +104,62 @@ const LocationSearch = () => {
           setSelectedIndex(-1);
         }}
       />
-      <div className="fixed top-5 left-0 lg:left-14  z-10 w-screen px-4 lg:w-112  rounded-lg ">
-        <div className="flex bg-white rounded-lg pe-4">
-          <div>
-            <FontAwesomeIcon
-              icon={faBars}
-              size="lg"
-              onClick={toggleMobileNav}
-              ref={navbarToggler}
-              className="cursor-pointer flex-none p-2 mx-2 my-1 bg-green-500 text-white lg:hidden rounded-lg"
-            />
-          </div>
+      <div className="fixed  top-5 left-0 lg:left-14  z-10 w-screen px-2 lg:w-112  rounded-lg ">
+        <div className="flex bg-white rounded-lg ">
+          <FontAwesomeIcon
+            icon={faBars}
+            size="lg"
+            onClick={toggleMobileNav}
+            ref={navbarToggler}
+            className="cursor-pointer flex-none p-2 mx-2 my-1 bg-green-500 text-white lg:hidden rounded-lg"
+          />
           <input
             type="text"
-            className="grow p-2 my-1 focus:outline-none w-full"
+            ref={locationSearchRef}
+            className="grow py-2 px-1 lg:px-4 my-1 focus:outline-none w-full"
             value={query}
             onChange={handleChange}
             onFocus={() => {
               setSearchActive(true);
             }}
             placeholder="Enter a location"
+          />
+          <FontAwesomeIcon
+            icon={faMagnifyingGlass}
+            size="lg"
+            className={`cursor-pointer flex-none p-2 mx-1 my-1 hover:bg-gray-400 rounded-lg ${
+              !searchActive && query.length > 0 ? 'hidden' : 'block'
+            }`}
+            onClick={() => {
+              locationSearchRef.current.focus();
+              fetchSuggestions(query);
+              if (suggestions.length > 0) {
+                homeDispatch({
+                  type: 'locationSearch',
+                  payload: suggestions[0],
+                });
+                setQuery(suggestions[0].display_name);
+                setSearchActive(false);
+                setSelectedIndex(-1);
+              }
+              if (searchActive && suggestions.length === 0) {
+                setSearchActive(false);
+                setSelectedIndex(-1);
+              }
+            }}
+          />
+          <FontAwesomeIcon
+            icon={faXmark}
+            size="lg"
+            className={`cursor-pointer flex-none p-2 mx-1 my-1 hover:bg-gray-400 rounded-lg ${
+              !searchActive && query.length > 0 ? 'block' : 'hidden'
+            }`}
+            onClick={() => {
+              locationSearchRef.current.focus();
+              setQuery('');
+              homeDispatch({ type: 'setSuggestions', payload: [] });
+              setSelectedIndex(-1);
+            }}
           />
         </div>
         <div
@@ -111,7 +171,7 @@ const LocationSearch = () => {
             <div
               key={index}
               onClick={() => {
-                setSelectedPlace(suggestion);
+                homeDispatch({ type: 'locationSearch', payload: suggestion });
                 setQuery(suggestion.display_name);
                 setSearchActive(false);
                 setSelectedIndex(-1);
@@ -124,6 +184,9 @@ const LocationSearch = () => {
               {suggestion.display_name}
             </div>
           ))}
+          {suggestions.length === 0 && query.length > 0 && (
+            <div className="px-4 py-1 border-b">No results found</div>
+          )}
         </div>
       </div>
     </>

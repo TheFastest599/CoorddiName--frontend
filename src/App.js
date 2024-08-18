@@ -13,14 +13,13 @@ import { HomeProvider } from './context/HomeContext';
 // import { HomeContext } from './context/HomeContext';
 import Navbar from './components/Navbar';
 
-const clientId = process.env.COORDINAME_GOOGLE_AUTH_CLIENT_ID;
-
 function App() {
+  const clientId = process.env.REACT_APP_COORDINAME_GOOGLE_AUTH_CLIENT_ID;
   useEffect(() => {
     gapi.load('auth2', () => {
       gapi.auth2.init({ client_id: clientId, scope: '' });
     });
-  });
+  }, [clientId]);
   return (
     <>
       <Router>

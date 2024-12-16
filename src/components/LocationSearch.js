@@ -10,7 +10,15 @@ import { GlobalContext } from '../context/GlobalContext';
 import { HomeContext } from '../context/HomeContext';
 
 const LocationSearch = () => {
-  const { homeState, homeDispatch, fetchSuggestions } = useContext(HomeContext);
+  const {
+    homeState,
+    homeDispatch,
+    fetchSuggestions,
+    stat,
+    searchMode,
+    setSearchMode,
+    fetchCoordiNameSuggestions,
+  } = useContext(HomeContext);
 
   const [query, setQuery] = useState('');
 
@@ -21,6 +29,8 @@ const LocationSearch = () => {
   const [searchActive, setSearchActive] = useState(false);
 
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  const [coordiLength, setCoordiLength] = useState(1);
 
   const suggestionRefs = useRef([]);
 
@@ -33,29 +43,73 @@ const LocationSearch = () => {
     const handleKeyDown = event => {
       if (searchActive && suggestions.length > 0) {
         if (event.key === 'ArrowDown') {
-          setSelectedIndex(prevIndex =>
-            prevIndex < suggestions.length - 1 ? prevIndex + 1 : prevIndex
-          );
+          setSelectedIndex(prevIndex => {
+            const newIndex =
+              prevIndex < suggestions.length - 1 ? prevIndex + 1 : prevIndex;
+            // console.log('Selected Index', suggestions[newIndex]);
+            if (searchMode && newIndex >= 0) {
+              setQuery(suggestions[newIndex]);
+            }
+            return newIndex;
+          });
         } else if (event.key === 'ArrowUp') {
-          setSelectedIndex(prevIndex =>
-            prevIndex > 0 ? prevIndex - 1 : prevIndex
-          );
+          setSelectedIndex(prevIndex => {
+            const newIndex = prevIndex > 0 ? prevIndex - 1 : prevIndex;
+            // console.log('Selected Index', suggestions[newIndex]);
+            if (searchMode && newIndex >= 0) {
+              setQuery(suggestions[newIndex]);
+            }
+            return newIndex;
+          });
         } else if (
           selectedIndex >= 0 &&
           event.key === 'Enter' &&
           suggestions.length > 0
         ) {
-          homeDispatch({
-            type: 'locationSearch',
-            payload: suggestions[selectedIndex],
-          });
-          setQuery(suggestions[selectedIndex].display_name);
-          setSearchActive(false);
+          if (!searchMode) {
+            homeDispatch({
+              type: 'locationSearch',
+              payload: suggestions[selectedIndex],
+            });
+            setQuery(suggestions[selectedIndex].display_name);
+            setSearchActive(false);
+          } else {
+            if (searchMode && coordiLength < 4) {
+              setQuery(suggestions[selectedIndex]);
+            }
+            if (searchMode && coordiLength === 4) {
+              setQuery(suggestions[selectedIndex]);
+              homeDispatch({
+                type: 'coordiNameSearch',
+                payload: suggestions[selectedIndex],
+              });
+              setSearchActive(false);
+              setSelectedIndex(-1);
+              // console.log('Search by CoordiName', suggestions[selectedIndex]);
+            }
+            // console.log('Search by CoordiName', suggestions[selectedIndex]);
+          }
         } else if (event.key === 'Enter' && suggestions.length > 0) {
-          homeDispatch({ type: 'locationSearch', payload: suggestions[0] });
-          setQuery(suggestions[0].display_name);
-          setSearchActive(false);
-          setSelectedIndex(-1);
+          if (!searchMode) {
+            homeDispatch({ type: 'locationSearch', payload: suggestions[0] });
+            setQuery(suggestions[0].display_name);
+            setSearchActive(false);
+            setSelectedIndex(-1);
+          } else {
+            if (searchMode) {
+              setQuery(suggestions[0]);
+              if (coordiLength === 4) {
+                // console.log('Search by CoordiName', suggestions[0]);
+                homeDispatch({
+                  type: 'coordiNameSearch',
+                  payload: suggestions[0],
+                });
+              }
+              setSearchActive(false);
+              setSelectedIndex(-1);
+            }
+            // console.log('Search by CoordiName', suggestions[0]);
+          }
         }
       }
     };
@@ -77,6 +131,10 @@ const LocationSearch = () => {
     }
   }, [selectedIndex]);
 
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [coordiLength]);
+
   // Handle input change
   const handleChange = e => {
     const newQuery = e.target.value;
@@ -87,7 +145,15 @@ const LocationSearch = () => {
     }
 
     const newTimeout = setTimeout(() => {
-      fetchSuggestions(newQuery);
+      if (newQuery.length > 2 && !searchMode) {
+        fetchSuggestions(newQuery);
+      } else if (newQuery.length > 0 && searchMode) {
+        fetchCoordiNameSuggestions(newQuery);
+        setCoordiLength(newQuery.split('-').length);
+        // console.log('Search by CoordiName', newQuery);
+      } else {
+        homeDispatch({ type: 'setSuggestions', payload: [] });
+      }
     }, 500);
 
     setDebounceTimeout(newTimeout);
@@ -116,13 +182,15 @@ const LocationSearch = () => {
           <input
             type="text"
             ref={locationSearchRef}
-            className="grow py-2 px-1 lg:px-4 my-1 focus:outline-none w-full"
+            className="grow py-2 px-1 lg:px-4 my-1 focus:outline-none w-full font-poppins"
             value={query}
             onChange={handleChange}
             onFocus={() => {
               setSearchActive(true);
             }}
-            placeholder="Enter a location"
+            placeholder={
+              searchMode ? 'Search CoordiName...' : 'Search Location...'
+            }
           />
           <FontAwesomeIcon
             icon={faMagnifyingGlass}
@@ -132,20 +200,34 @@ const LocationSearch = () => {
             }`}
             onClick={() => {
               locationSearchRef.current.focus();
-              fetchSuggestions(query);
-              if (suggestions.length > 0) {
+              if (!searchMode && suggestions.length > 0) {
                 homeDispatch({
                   type: 'locationSearch',
                   payload: suggestions[0],
                 });
+                fetchSuggestions(query);
                 setQuery(suggestions[0].display_name);
                 setSearchActive(false);
                 setSelectedIndex(-1);
-              }
-              if (searchActive && suggestions.length === 0) {
+              } else if (
+                searchMode &&
+                suggestions.length > 0 &&
+                coordiLength === 4
+              ) {
+                // console.log('Search by CoordiName', suggestions[0]);
+                homeDispatch({
+                  type: 'coordiNameSearch',
+                  payload: suggestions[0],
+                });
                 setSearchActive(false);
                 setSelectedIndex(-1);
               }
+              // if (suggestions.length > 0) {
+              // }
+              // if (searchActive && suggestions.length === 0) {
+              //   setSearchActive(false);
+              //   setSelectedIndex(-1);
+              // }
             }}
           />
           <FontAwesomeIcon
@@ -162,6 +244,19 @@ const LocationSearch = () => {
             }}
           />
         </div>
+        {searchActive && query.length === 0 && (
+          <div className="mt-2 relative">
+            <button
+              className="absolute right-5 px-4 py-1 font-poppins text-sm bg-white rounded-lg cursor-pointer"
+              onClick={() => {
+                setSearchMode(!searchMode);
+                homeDispatch({ type: 'setSuggestions', payload: [] });
+              }}
+            >
+              {searchMode ? 'Search by Location?' : 'Search by CoordiName?'}
+            </button>
+          </div>
+        )}
         <div
           className={`bg-white rounded-lg  mt-2 max-h-80 overflow-y-auto ${
             searchActive ? 'block' : 'hidden'
@@ -171,22 +266,54 @@ const LocationSearch = () => {
             <div
               key={index}
               onClick={() => {
-                homeDispatch({ type: 'locationSearch', payload: suggestion });
-                setQuery(suggestion.display_name);
-                setSearchActive(false);
-                setSelectedIndex(-1);
+                if (!searchMode) {
+                  homeDispatch({
+                    type: 'locationSearch',
+                    payload: suggestion,
+                  });
+                  setQuery(suggestion.display_name);
+                  setSearchActive(false);
+                  setSelectedIndex(-1);
+                } else {
+                  // homeDispatch({
+                  //   type: 'coordiNameSearch',
+                  //   payload: suggestion,
+                  // });
+                  if (coordiLength === 4) {
+                    // console.log('Search by CoordiName', suggestion);
+                    setQuery(suggestion);
+                    setSearchActive(false);
+                    setSelectedIndex(-1);
+                    homeDispatch({
+                      type: 'coordiNameSearch',
+                      payload: suggestion,
+                    });
+                  } else {
+                    setSelectedIndex(index);
+                    setQuery(suggestion);
+                  }
+                }
               }}
               ref={el => (suggestionRefs.current[index] = el)}
-              className={`hover:bg-gray-300 px-4 py-1 border-b ${
+              className={`hover:bg-gray-300 px-4 py-1 border-b font-poppins ${
                 index === selectedIndex ? 'bg-gray-300' : ''
               }`}
             >
-              {suggestion.display_name}
+              {searchMode ? suggestion : suggestion.display_name}
             </div>
           ))}
-          {suggestions.length === 0 && query.length > 0 && (
-            <div className="px-4 py-1 border-b">No results found</div>
+          {stat.suggestions && suggestions.length === 0 && query.length > 0 && (
+            <div className="px-4 py-1 border-b font-poppins">
+              No results found
+            </div>
           )}
+          {!stat.suggestions &&
+            suggestions.length === 0 &&
+            query.length > 0 && (
+              <div className="px-4 py-1 border-b skeleton-loader font-poppins">
+                Searching...
+              </div>
+            )}
         </div>
       </div>
     </>

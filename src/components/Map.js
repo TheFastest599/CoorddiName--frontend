@@ -9,9 +9,10 @@ import {
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { HomeContext } from '../context/HomeContext';
+import GridLayer from './GridLayer';
 
 function Map() {
-  const { homeState, homeDispatch } = useContext(HomeContext);
+  const { homeState, homeDispatch, stat } = useContext(HomeContext);
 
   let position = homeState.position;
   // ----------------- GoToCoordinates -----------------
@@ -32,7 +33,7 @@ function Map() {
     useMapEvents({
       click(e) {
         const { lat, lng } = e.latlng;
-        homeDispatch({ type: 'mapClick', payload: [lat, lng] });
+        homeDispatch({ type: 'setLocation', payload: [lat, lng] });
       },
     });
     return null;
@@ -54,6 +55,7 @@ function Map() {
         style={{ height: '100vh', width: '100vw', zIndex: 0 }}
         center={position}
         zoom={13}
+        maxZoom={18}
         scrollWheelZoom={true}
         zoomControl={false}
       >
@@ -63,6 +65,7 @@ function Map() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        {stat.grid && <GridLayer />}
         {/* Satellite View  Stadia.AlidadeSatellite*/}
         {/* <TileLayer
           attribution='&copy; CNES, Distribution Airbus DS, &copy; Airbus DS, &copy; PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'

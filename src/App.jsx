@@ -14,7 +14,7 @@ import { HomeProvider } from './context/HomeContext';
 import Navbar from './components/component/Navbar';
 
 function App() {
-  const clientId = process.env.REACT_APP_COORDINAME_GOOGLE_AUTH_CLIENT_ID;
+  const clientId = import.meta.env.VITE_COORDINAME_GOOGLE_AUTH_CLIENT_ID;
   useEffect(() => {
     gapi.load('auth2', () => {
       gapi.auth2.init({ client_id: clientId, scope: '' });

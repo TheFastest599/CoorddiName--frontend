@@ -12,7 +12,7 @@ import { HomeContext } from '../../context/HomeContext';
 import GridLayer from './GridLayer';
 
 function Map() {
-  const stadiaApiKey = process.env.REACT_APP_STADIA_API_KEY;
+  const stadiaApiKey = import.meta.env.VITE_STADIA_API_KEY;
 
   const { homeState, homeDispatch, stat } = useContext(HomeContext);
 
@@ -41,7 +41,7 @@ function Map() {
     return null;
   };
 
-  // const apiKey = process.env.REACT_APP_STADIA_API_KEY;
+  // const apiKey = import.meta.env.VITE_STADIA_API_KEY;
   // const handleButtonClick = () => {
   //   const lat = prompt('Enter latitude:');
   //   const lng = prompt('Enter longitude:');

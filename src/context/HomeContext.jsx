@@ -10,7 +10,7 @@ import axios from 'axios';
 export const HomeContext = createContext();
 
 export const HomeProvider = ({ children }) => {
-  const HOST = process.env.REACT_APP_HOST;
+  const HOST = import.meta.env.VITE_HOST;
 
   const initialHomeState = {
     position: [28.6273928, 77.1716954],

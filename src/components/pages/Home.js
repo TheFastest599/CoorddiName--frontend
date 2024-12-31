@@ -6,6 +6,7 @@ import { HomeContext } from '../../context/HomeContext';
 
 function Home() {
   const { setStat } = useContext(HomeContext);
+  // Front React
   return (
     <div>
       <Map />

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
-import { HomeContext } from '../context/HomeContext';
-import { GlobalContext } from '../context/GlobalContext';
+import { HomeContext } from '../../context/HomeContext';
+import { GlobalContext } from '../../context/GlobalContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { useSwipeable } from 'react-swipeable';

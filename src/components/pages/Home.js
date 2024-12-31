@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
-import Map from './Map';
-import LocationSearch from './LocationSearch';
-import InfoBox from './InfoBox';
-import { HomeContext } from '../context/HomeContext';
+import Map from '../component/Map';
+import LocationSearch from '../component/LocationSearch';
+import InfoBox from '../component/InfoBox';
+import { HomeContext } from '../../context/HomeContext';
 
 function Home() {
   const { setStat } = useContext(HomeContext);

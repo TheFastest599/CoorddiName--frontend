@@ -6,8 +6,8 @@ import {
   faMagnifyingGlass,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
-import { GlobalContext } from '../context/GlobalContext';
-import { HomeContext } from '../context/HomeContext';
+import { GlobalContext } from '../../context/GlobalContext';
+import { HomeContext } from '../../context/HomeContext';
 
 const LocationSearch = () => {
   const {

@@ -81,7 +81,7 @@ function Map() {
           maxZoom={20}
         /> */}
         {/* gridSize - 1 for 1 sec precision, 0.25 for 1/4 sec precision and so on. trigZoom - zoomLevel on which the grid will activate*/}
-        {stat.grid && <GridLayer gridSize={1} trigZoom={14} />}
+        {stat.grid && <GridLayer gridSize={0.25} trigZoom={16} />}
         <Marker position={position}>
           <Popup>
             A pretty CSS3 popup. <br /> Easily customizable.

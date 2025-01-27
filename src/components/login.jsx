@@ -1,11 +1,7 @@
 import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
-// import { jwtDecode } from 'jwt-decode';
 
-const clientId =
-  '410704154149-r3dr8ovkdaahbfajni6v7spsr8u52geg.apps.googleusercontent.com';
-
-function Login() {
+function Login(clientId) {
   // Capitalized component name
   const onSuccess = async response => {
     console.log(response);
@@ -64,7 +60,7 @@ function Login() {
     console.log('Login Failed: response:', response);
   };
   return (
-    <div id="signInButton">
+    <div id="signInButton" className="w-72">
       <GoogleLogin
         clientId={clientId}
         buttonText="Login"

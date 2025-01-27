@@ -12,6 +12,7 @@ module.exports = {
         88: '22rem',
         112: '28rem',
         128: '32rem',
+        'nav-height': 'calc(100vh - 0.5rem)',
       },
       maxHeight: {
         88: '22rem',
@@ -38,5 +39,29 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.scrollbar-custom': {
+          '&::-webkit-scrollbar': {
+            width: '4px',
+          },
+          '&::-webkit-scrollbar-track': {
+            'border-radius': '9999px',
+            'background-color': 'rgba(243, 244, 246, 0.1)', // gray-100 with low opacity
+          },
+          '&::-webkit-scrollbar-thumb': {
+            'border-radius': '9999px',
+            'background-color': '#d1d5db', // gray-300
+          },
+          '.dark &::-webkit-scrollbar-track': {
+            'background-color': 'rgba(55, 65, 81, 0.1)', // neutral-700 with low opacity
+          },
+          '.dark &::-webkit-scrollbar-thumb': {
+            'background-color': '#6b7280', // neutral-500
+          },
+        },
+      });
+    },
+  ],
 };

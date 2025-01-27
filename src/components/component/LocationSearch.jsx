@@ -1,11 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
+import { FaBars, FaMagnifyingGlass, FaXmark } from 'react-icons/fa6';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faBars,
-  faMagnifyingGlass,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
 import { GlobalContext } from '../../context/GlobalContext';
 import { HomeContext } from '../../context/HomeContext';
 
@@ -172,12 +167,10 @@ const LocationSearch = () => {
       />
       <div className="fixed  top-5 left-0 lg:left-14  z-10 w-screen px-2 lg:w-112  rounded-lg ">
         <div className="flex bg-white rounded-lg ">
-          <FontAwesomeIcon
-            icon={faBars}
-            size="lg"
+          <FaBars
             onClick={toggleMobileNav}
             ref={navbarToggler}
-            className="cursor-pointer flex-none p-2 mx-2 my-1 bg-green-500 text-white lg:hidden rounded-lg"
+            className="cursor-pointer flex-none p-2 mx-2 my-1 text-4xl bg-green-500 text-white lg:hidden rounded-lg"
           />
           <input
             type="text"
@@ -192,10 +185,8 @@ const LocationSearch = () => {
               searchMode ? 'Search CoordiName...' : 'Search Location...'
             }
           />
-          <FontAwesomeIcon
-            icon={faMagnifyingGlass}
-            size="lg"
-            className={`cursor-pointer flex-none p-2 mx-1 my-1 hover:bg-gray-400 rounded-lg ${
+          <FaMagnifyingGlass
+            className={`cursor-pointer text-4xl flex-none p-2 mx-1 my-1 hover:bg-gray-400 rounded-lg ${
               !searchActive && query.length > 0 ? 'hidden' : 'block'
             }`}
             onClick={() => {
@@ -230,10 +221,8 @@ const LocationSearch = () => {
               // }
             }}
           />
-          <FontAwesomeIcon
-            icon={faXmark}
-            size="lg"
-            className={`cursor-pointer flex-none p-2 mx-1 my-1 hover:bg-gray-400 rounded-lg ${
+          <FaXmark
+            className={`cursor-pointer text-4xl flex-none p-2 mx-1 my-1 hover:bg-gray-400 rounded-lg ${
               !searchActive && query.length > 0 ? 'block' : 'hidden'
             }`}
             onClick={() => {
